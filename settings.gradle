@@ -1,0 +1,54 @@
+rootProject.name = 'thunder-market'
+include ("api")
+
+
+//2
+def file(dir, name){
+    return file("${dir.absolutePath}/${name}") // 디렉토리의 path 밑으로 name으로 파일을 생성
+}
+
+//4-2
+def GRADLE_TEXT = """  // 그래들 파일에 넣을 껍데기용 내용
+dependencies {
+    
+}
+"""
+
+// 1
+["api"].forEach(moduleName -> {
+    def moduleDir = file(rootDir, moduleName); // 루트 디렉토리 및에 모듈네임 생성
+    //3
+    /*if(!moduleDir.exists()){ // 해당 모듈이 없을시에는 모듈을 생성
+        moduleDir.mkdirs()
+    }*/
+
+    //4-1
+    moduleDir.eachFile {subProjectDir ->  // moduleDir라는 서브 프로젝트 디렉토리가 인식이 되면
+       /*def buildFile = file(subProjectDir, "build.gradle"); // 서브 프로젝트에 build.gradle 파일을 생성
+        if(!buildFile.exists()){ // 빌드 파일이 존재하지 않으면
+            buildFile.text = GRADLE_TEXT // 기본 그래들 텍스트를 삽입
+        }*/
+
+        //5
+        // build.gradle 파일이 있는 서브 디렉토리를 서브 프로젝트로 등록
+        def ProjectName = ":${moduleName}-${subProjectDir.name}"
+        include ProjectName   // 생성한 프로젝트 네임을 include
+        project(ProjectName).projectDir = subProjectDir
+        // 서브 프로젝트의 디렉토리를 해당 프로젝트 디렉토리로 등록 (해당 프로젝트 디렉토리를 서브 프로젝트 디렉토리로 설정)
+
+        //6-1  자바 플러그인을 apply 하기위한 설정
+        /*[
+            "src/main/java/com/api/unit",
+            "src/main/resources",
+            "src/test/java/com/api/unit",
+            "src/test/resources",
+        ].forEach(src -> {  // java의 프로젝트가 서브 프로젝트 밑에 생성됨을 보장
+            def srcDir = file(rootDir, moduleName);
+            if(!srcDir.exists()){
+                srcDir.mkdirs()
+            }
+        })*/
+        //6-2 루트 프로젝트의 build.gradle에서 이 파일들을 src 디렉토리와
+        //resources 디렉토리로 인식할 수 있도록 설정해야함
+    }
+})
