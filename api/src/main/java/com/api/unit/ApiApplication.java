@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(ApiApplication.class, args);
-        System.out.println("자 이제 시작이야 내꿈을");
+        System.out.println("자 이제 시작이야 내꿈을~");
     }
 }
 
