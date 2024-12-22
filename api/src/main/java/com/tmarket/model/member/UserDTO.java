@@ -1,19 +1,19 @@
-package com.model.member;
+package com.tmarket.model.member;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
-@Data
+@Getter
+@Setter
 public class UserDTO {
     @Column(name="name", nullable = false, length = 30)
     private String name;
 
-//    @Id
     @Column(name="id", length = 30)
     private String id;
 

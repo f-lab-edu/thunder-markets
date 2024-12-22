@@ -1,15 +1,22 @@
-HELP.md
+### Gradle 관련 ###
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+# Gradle Wrapper JAR 파일은 제외하지 않음
 
-### IntelliJ IDEA ###
+### IntelliJ IDEA 관련 ###
 .idea
 *.iws
 *.iml
 *.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+
+### Java 빌드 파일 ###
+*.class
+
+###운영 체제 및 환경별 파일 ###
+Thumbs.db
+# 파일 썸네일 캐시 정보(Windows)
+
+### 테스트 리포트 ###
+/test-results/
