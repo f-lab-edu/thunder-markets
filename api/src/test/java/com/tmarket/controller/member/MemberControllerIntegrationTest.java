@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // 내장 Ramdom Port 사용
 public class MemberControllerIntegrationTest {
 
-    @LocalServerPort // port 주입
+    @LocalServerPort // port 주입.
     private int port;
 
     @Autowired  // TestRestTemplate 사용
