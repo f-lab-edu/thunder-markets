@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: local           # 다중 환경을 위한 설정
+  application:
+    jwt:
+      expiration: 86400000  # JWT 토큰 만료 시간 (1일 = 86400000ms)
+  data:
+    redis:
+      host: localhost       # Redis 서버의 호스트명
+      port: 6379            # Redis 서버의 포트 번호
+      timeout: 2000ms       # Redis 연결 타임아웃
