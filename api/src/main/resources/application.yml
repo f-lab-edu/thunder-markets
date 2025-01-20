@@ -9,3 +9,7 @@ spring:
       host: localhost       # Redis 서버의 호스트명
       port: 6379            # Redis 서버의 포트 번호
       timeout: 2000ms       # Redis 연결 타임아웃
+
+property-test-config:
+  authLogintUrl: /auth/login
+  port: 8080
