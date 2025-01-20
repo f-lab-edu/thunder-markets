@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, // 내장 Ramdom Port 사용
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, // 내장 Random Port 사용
         properties = {
                 "propertyTest.value=/auth/login"
         })
@@ -40,8 +40,8 @@ public class MemberControllerIntegrationTest {
     // 여기서는 ObjectMapper의 사용법을 익히기 위해 후자의 방식을 채택하였다.
     //  => 로그인 실패 응답: {"token":"아이디 혹은 이메일이 유효하지 않습니다.","name":null,"email":null,"lastDt":null}
     //  => 로그인 성공 응답: {"token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYmtkZXZlbG9wNTdAZ21haWwuY29tIiwibmFtZSI6Iuy1nOuzkeq2jCIsImV4cCI6MTczNjY4NDI4NX0.F1mLoR2xfEirG9XNQ1tEZ-zNH1d5BL6K0DarYx8whb4","name":"최병권","email":"cbkdevelop57@gmail.com","lastDt":"2025-01-11T12:18:05.733+00:00"}
-    @Autowired
-    private ObjectMapper objectMapper; // Jackson ObjectMapper 주입
+    @Autowired // Jackson ObjectMapper 주입
+    private ObjectMapper objectMapper;
 
     private String baseUrl;
 
