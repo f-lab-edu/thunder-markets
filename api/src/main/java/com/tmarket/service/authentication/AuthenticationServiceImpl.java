@@ -1,5 +1,7 @@
 package com.tmarket.service.authentication;
 
+import com.tmarket.exception.IncorrectPasswordException;
+import com.tmarket.exception.UserNotFoundException;
 import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.UserDTO;
 import io.jsonwebtoken.Jwts;
@@ -39,20 +41,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginDTO.LoginResponse authenticateUser(LoginDTO.LoginRequest request) {
         // 인증 로직 구현
-        if (request.getEmail() == null || request.getPassword() == null) {
+        if (request.getEmail() == null || request.getPassword() == null
+                || request.getEmail().isEmpty() || request.getPassword().isEmpty()) {
             throw new IllegalArgumentException("아이디와 비밀번호는 필수 입력값입니다.");
         }
         // 로그인 입력값 조회
         UserDTO user = userInfoStore.get(request.getEmail());
 
-        // 사용자 확인
-        if (user == null) {
-            throw new UnauthorizedException("아이디 혹은 이메일이 유효하지 않습니다.");
+        // 사용자 확인 (예외 처리 세분화 : UnauthorizedException -> UserNotFoundException)
+        if (user == null || user.getEmail().isEmpty()) {
+            throw new UserNotFoundException("아이디 혹은 이메일이 유효하지 않습니다.");
         }
 
-        // 비밀번호 확인
-        if (!BCrypt.checkpw(request.getPassword(), user.getPassword())) {
-            throw new UnauthorizedException("아이디 혹은 이메일이 유효하지 않습니다.");
+        // 비밀번호 확인 (예외 처리 세분화 : UnauthorizedException -> IncorrectPasswordException)
+        if (request.getPassword().isEmpty() || !BCrypt.checkpw(request.getPassword(), user.getPassword())) {
+            throw new IncorrectPasswordException("아이디 혹은 이메일이 유효하지 않습니다.");
         }
 
         // 마지막 로그인 날짜 설정
