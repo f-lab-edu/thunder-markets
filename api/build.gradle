@@ -42,7 +42,12 @@ dependencies {
     // 테스트 코드
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-//    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2'
+
+    // HttpComponentsClientHttpRequestFactory 라이브러리 추가
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2'
+
+    // h2 데이터베이스
+    implementation 'com.h2database:h2:2.3.232'
 }
 
 compileJava.options.encoding = 'UTF-8'

@@ -1,5 +1,6 @@
 package com.tmarket.exception;
 
+import com.tmarket.model.member.LoginDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,30 +18,28 @@ public class GlobalExceptionHandler {
 
     // 401 Unauthorized 예외 처리 (UnauthorizedException)
     @ExceptionHandler({UserNotFoundException.class, IncorrectPasswordException.class})
-    public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException ex) {
+    public ResponseEntity<LoginDTO.LoginResponse> handleUnauthorizedException(UnauthorizedException ex) {
         logger.error("인증 실패: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        LoginDTO.LoginResponse response = new LoginDTO.LoginResponse(
+                ex.getMessage(),
+                null,
+                null,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     // 400 Bad Request 예외 처리 (InvalidRequestException)
-    @ExceptionHandler(InvalidRequestException.class)
-    public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException ex) {
+    @ExceptionHandler({InvalidRequestException.class, IllegalArgumentException.class})
+    public ResponseEntity<LoginDTO.LoginResponse> handleInvalidRequestException(Exception ex) {
         logger.error("잘못된 요청: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    // 404 Not Found 예외 처리 (ResourceNotFoundException)
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        logger.error("리소스를 찾을 수 없음: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
-    // 500 Internal Server Error 예외 처리  (InternalServerException)
-    @ExceptionHandler(InternalServerException.class)
-    public ResponseEntity<String> handleInternalServerException(InternalServerException ex) {
-        logger.error("서버 내부 오류 발생: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류가 발생했습니다.");
+        LoginDTO.LoginResponse response = new LoginDTO.LoginResponse(
+                ex.getMessage(),
+                null,
+                null,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     // 500 기타 모든 예외 처리 (Exception)
