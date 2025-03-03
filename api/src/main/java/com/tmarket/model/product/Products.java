@@ -42,25 +42,25 @@ public class Products {
     private String paymentOption;  // 결제 옵션
 
     @Column(name = "thumb_product_img", nullable = false, length = 255)
-    private String thumbProductImg;  // 대표 이미지 URL
+    private String thumbnailProductImage;  // 대표 이미지 URL
 
     @Column(name = "product_stts", nullable = false, length = 20)
-    private String productStts;  // 상품 상태 (예: 판매 중, 품절 등)
+    private String productStatus;  // 상품 상태 (예: 판매 중, 품절 등)
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;  // 활성화 여부
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "reg_dt", nullable = false, updatable = false)
-    private Date regDt;  // 등록 날짜
+    private Date registDate;  // 등록 날짜
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "mod_dt")
-    private Date modDt;  // 수정 날짜
+    private Date modifyDate;  // 수정 날짜
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "del_dt")
-    private Date delDt;  // 삭제 날짜
+    private Date deleteDate;  // 삭제 날짜
 
     // seller_id -> User 엔티티의 userId 참조 (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -74,13 +74,13 @@ public class Products {
     // 엔티티 생성 전 실행되는 메서드
     @PrePersist
     protected void onCreate() {
-        this.regDt = new Date();
-        this.modDt = new Date();
+        this.registDate = new Date();
+        this.modifyDate = new Date();
     }
 
     // 엔티티 수정 전 실행되는 메서드
     @PreUpdate
     protected void onUpdate() {
-        this.modDt = new Date();
+        this.modifyDate = new Date();
     }
 }

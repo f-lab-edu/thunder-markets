@@ -62,10 +62,11 @@ public class MemberControllerIntegrationTest {
         // then(테스트 결과 검증)
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getToken()).isEqualTo(expectedErrorMessage);
+        assertThat(response.getBody().getAccessToken()).isNull();
         assertThat(response.getBody().getName()).isNull();
         assertThat(response.getBody().getEmail()).isNull();
-        assertThat(response.getBody().getLastDt()).isNull();
+        assertThat(response.getBody().getLastLoginDate()).isNull();
+        assertThat(response.getBody().getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
 
     @Test
@@ -83,10 +84,11 @@ public class MemberControllerIntegrationTest {
         // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getToken()).isNotBlank();
+        assertThat(response.getBody().getAccessToken()).isNotBlank();
         assertThat(response.getBody().getName()).isEqualTo("최병권");
         assertThat(response.getBody().getEmail()).isEqualTo("cbkdevelop57@gmail.com");
-        assertThat(response.getBody().getLastDt()).isNotNull();
+        assertThat(response.getBody().getLastLoginDate()).isNotNull();
+        assertThat(response.getBody().getErrorMessage()).isNull();
     }
 
     @Test
@@ -108,10 +110,11 @@ public class MemberControllerIntegrationTest {
         // then(테스트 결과 검증)
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getToken()).isEqualTo(expectedErrorMessage);
+        assertThat(response.getBody().getAccessToken()).isNull();
         assertThat(response.getBody().getName()).isNull();
         assertThat(response.getBody().getEmail()).isNull();
-        assertThat(response.getBody().getLastDt()).isNull();
+        assertThat(response.getBody().getLastLoginDate()).isNull();
+        assertThat(response.getBody().getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
 
     @Test
@@ -133,9 +136,10 @@ public class MemberControllerIntegrationTest {
         // then(테스트 결과 검증)
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getToken()).isEqualTo(expectedErrorMessage);
+        assertThat(response.getBody().getAccessToken()).isNull();
         assertThat(response.getBody().getName()).isNull();
         assertThat(response.getBody().getEmail()).isNull();
-        assertThat(response.getBody().getLastDt()).isNull();
+        assertThat(response.getBody().getLastLoginDate()).isNull();
+        assertThat(response.getBody().getErrorMessage()).isEqualTo(expectedErrorMessage);
     }
 }

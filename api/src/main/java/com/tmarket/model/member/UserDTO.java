@@ -1,6 +1,6 @@
 package com.tmarket.model.member;
 
-import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,59 +8,26 @@ import java.util.Date;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class UserDTO {
 
-    @Column(name="userId", nullable = false, length = 30)
     private String userId;
 
-    @Column(name="name", nullable = false, length = 30)
     private String name;
 
-    @Column(name="email", nullable = false, length = 30)
     private String email;
 
-    @Column(name="password", nullable = false, length = 30)
     private String password;
 
-    @Column(name="memberStts", nullable = false, length = 10)
-    private String memberStts;
+    private String memberStatus;
 
-    @Column(name="regDt", nullable = false, length = 15)
-    private Date regDt;
+    private Date registDate;
 
-    @Column(name="modDt", nullable = false, length = 15)
-    private Date modDt;
+    private Date modifyDate;
 
-    @Column(name="lastDt", nullable = false, length = 15)
-    private Date lastDt;
+    private Date deleteDate;
 
-    @Column(name="isActive", nullable = false, length = 2)
+    private Date lastLoginDate;
+
     private Boolean isActive;
-
-    public UserDTO(String userId, String name, String email, String password, String memberStts, Date regDt, Date modDt, Date lastDt, Boolean isActive) {
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.memberStts = memberStts;
-        this.regDt = regDt;
-        this.modDt = modDt;
-        this.lastDt = lastDt;
-        this.isActive = isActive;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDTO{" +
-                "userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", memberStts='" + memberStts + '\'' +
-                ", regDt=" + regDt +
-                ", modDt=" + modDt +
-                ", lastDt=" + lastDt +
-                ", isActive=" + isActive +
-                '}';
-    }
 }

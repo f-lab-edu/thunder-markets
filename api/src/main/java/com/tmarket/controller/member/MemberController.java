@@ -4,9 +4,7 @@ import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.LoginDTO.LoginRequest;
 import com.tmarket.model.member.LoginDTO.LoginResponse;
 import com.tmarket.service.authentication.AuthenticationService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +31,18 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(
             @RequestBody LoginRequest request,
-            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-            HttpSession session) throws RuntimeException {
+            HttpServletResponse httpServletResponse) throws RuntimeException {
 
         logger.info("로그인 요청: {}", request.toString());
 
         LoginDTO.LoginResponse response = authenticationService.authenticateUser(request);
+        httpServletResponse.setHeader("Authorization", "Bearer " + response.getAccessToken());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<LoginResponse> logoutUser(
-            @RequestBody LoginRequest request,
-            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-            HttpSession session) throws RuntimeException {
+            @RequestBody LoginRequest request) throws RuntimeException {
 
         logger.info("로그인 요청: {}", request.getClass());
 
