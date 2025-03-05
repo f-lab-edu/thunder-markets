@@ -4,12 +4,14 @@ spring:
   application:
     jwt:
       expiration: 86400000  # JWT 토큰 만료 시간 (1일 = 86400000ms)
+  servlet:
+    multipart:
+      max-file-size: 10MB
   data:
     redis:
       host: localhost       # Redis 서버의 호스트명
       port: 6379            # Redis 서버의 포트 번호
       timeout: 2000ms       # Redis 연결 타임아웃
-
   datasource:
     driver-class-name: org.h2.Driver
     url: 'jdbc:h2:~/tmarket'

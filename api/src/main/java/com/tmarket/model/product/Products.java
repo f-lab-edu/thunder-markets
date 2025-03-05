@@ -4,8 +4,10 @@ import com.tmarket.model.member.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -82,5 +84,27 @@ public class Products {
     @PreUpdate
     protected void onUpdate() {
         this.modifyDate = new Date();
+    }
+
+
+    public Products(ProductDTO productDTO, User seller) {
+        this.productName = productDTO.getProductName();
+        this.productTitle = productDTO.getProductTitle();
+        this.productContent = productDTO.getProductContent();
+        this.productPrice = productDTO.getProductPrice();
+        this.productCategories = productDTO.getProductCategories();
+        this.paymentOption = productDTO.getPaymentOption();
+        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
+        this.productStatus = productDTO.getProductStatus();
+        this.isActive = productDTO.getIsActive();
+        this.registDate = productDTO.getRegistDate();
+        this.modifyDate = productDTO.getModifyDate();
+        this.deleteDate = productDTO.getDeleteDate();
+        this.seller = seller;
+        this.productImages = productDTO.getProductImages() != null ?
+                productDTO.getProductImages().stream()
+                        .map(imageDTO -> new ProductImage(imageDTO, this))
+                        .collect(Collectors.toList()) :
+                new ArrayList<>();
     }
 }

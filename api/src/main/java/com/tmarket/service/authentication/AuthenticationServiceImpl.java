@@ -1,13 +1,13 @@
 package com.tmarket.service.authentication;
 
 import com.tmarket.exception.IncorrectPasswordException;
+import com.tmarket.exception.JwtExceptions;
 import com.tmarket.exception.UserNotFoundException;
 import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.User;
 import com.tmarket.model.member.UserDTO;
 import com.tmarket.repository.member.UserRepository;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,5 +89,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastLoginDate(user.getLastLoginDate())
                 .isActive(user.getIsActive())
                 .build();
+    }
+
+    @Override
+    public String validateTokenAndGetUserId(String token) {
+        try {
+            // 토큰을 파싱하고 서명을 검증하여 유효성을 확인
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(accessTokenKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            // 토큰에서 사용자 ID 추출
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new JwtExceptions.TokenExpiredException("토큰이 만료되었습니다.");
+        } catch (UnsupportedJwtException e) {
+            throw new JwtExceptions.UnsupportedTokenException("지원되지 않는 토큰 형식입니다.");
+        } catch (MalformedJwtException e) {
+            throw new JwtExceptions.MalformedTokenException("잘못된 토큰 형식입니다.");
+        } catch (SignatureException e) {
+            throw new JwtExceptions.InvalidSignatureException("유효하지 않은 서명입니다.");
+        } catch (JwtException e) {
+            throw new JwtExceptions.InvalidTokenException("유효하지 않은 토큰입니다.");
+        }
     }
 }

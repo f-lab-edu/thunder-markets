@@ -58,6 +58,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler({
+            JwtExceptions.TokenExpiredException.class,
+            JwtExceptions.UnsupportedTokenException.class,
+            JwtExceptions.MalformedTokenException.class,
+            JwtExceptions.InvalidSignatureException.class,
+            JwtExceptions.InvalidTokenException.class
+    })
+    public ResponseEntity<String> handleJwtExceptions(UnauthorizedException ex) {
+        logger.error("JWT 예외 발생: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
     // 500 기타 모든 예외 처리 (Exception)
     @ExceptionHandler({InternalServerException.class, Exception.class})
     public ResponseEntity<String> handleGlobalException(Exception ex) {

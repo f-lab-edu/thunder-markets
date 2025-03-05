@@ -12,22 +12,13 @@ import java.util.Date;
 public class UserDTO {
 
     private String userId;
-
     private String name;
-
     private String email;
-
     private String password;
-
     private String memberStatus;
-
     private Date registDate;
-
     private Date modifyDate;
-
     private Date deleteDate;
-
     private Date lastLoginDate;
-
     private Boolean isActive;
 }
