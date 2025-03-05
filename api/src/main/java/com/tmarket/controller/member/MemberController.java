@@ -1,12 +1,11 @@
 package com.tmarket.controller.member;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tmarket.exception.UnauthorizedException;
 import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.LoginDTO.LoginRequest;
 import com.tmarket.model.member.LoginDTO.LoginResponse;
 import com.tmarket.service.authentication.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,8 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(
             @RequestBody LoginRequest request,
-            HttpServletRequest httpServletRequest,
-            HttpSession session) throws RuntimeException, IllegalArgumentException, UnauthorizedException {
+            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+            HttpSession session) throws RuntimeException {
 
         logger.info("로그인 요청: {}", request.toString());
 
@@ -44,8 +43,11 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logoutUser(@RequestBody LoginRequest request,
-                                                   HttpServletRequest httpServletRequest, HttpSession session) throws RuntimeException, JsonProcessingException {
+    public ResponseEntity<LoginResponse> logoutUser(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+            HttpSession session) throws RuntimeException {
+
         logger.info("로그인 요청: {}", request.getClass());
 
         return null;
