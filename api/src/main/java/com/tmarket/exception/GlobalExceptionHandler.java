@@ -20,12 +20,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({UserNotFoundException.class, IncorrectPasswordException.class})
     public ResponseEntity<LoginDTO.LoginResponse> handleUnauthorizedException(UnauthorizedException ex) {
         logger.error("인증 실패: {}", ex.getMessage());
-        LoginDTO.LoginResponse response = new LoginDTO.LoginResponse(
-                ex.getMessage(),
-                null,
-                null,
-                null
-        );
+        LoginDTO.LoginResponse response = LoginDTO.LoginResponse.builder()
+                .accessToken(null)
+                .refreshToken(null)
+                .expirationDate(null)
+                .userId(null)
+                .name(null)
+                .email(null)
+                .memberStatus(null)
+                .registDate(null)
+                .modifyDate(null)
+                .lastLoginDate(null)
+                .isActive(null)
+                .errorMessage(ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
@@ -33,17 +41,37 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({InvalidRequestException.class, IllegalArgumentException.class})
     public ResponseEntity<LoginDTO.LoginResponse> handleInvalidRequestException(Exception ex) {
         logger.error("잘못된 요청: {}", ex.getMessage());
-        LoginDTO.LoginResponse response = new LoginDTO.LoginResponse(
-                ex.getMessage(),
-                null,
-                null,
-                null
-        );
+        LoginDTO.LoginResponse response = LoginDTO.LoginResponse.builder()
+                .accessToken(null)
+                .refreshToken(null)
+                .expirationDate(null)
+                .userId(null)
+                .name(null)
+                .email(null)
+                .memberStatus(null)
+                .registDate(null)
+                .modifyDate(null)
+                .lastLoginDate(null)
+                .isActive(null)
+                .errorMessage(ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler({
+            JwtExceptions.TokenExpiredException.class,
+            JwtExceptions.UnsupportedTokenException.class,
+            JwtExceptions.MalformedTokenException.class,
+            JwtExceptions.InvalidSignatureException.class,
+            JwtExceptions.InvalidTokenException.class
+    })
+    public ResponseEntity<String> handleJwtExceptions(UnauthorizedException ex) {
+        logger.error("JWT 예외 발생: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
     // 500 기타 모든 예외 처리 (Exception)
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({InternalServerException.class, Exception.class})
     public ResponseEntity<String> handleGlobalException(Exception ex) {
         logger.error("예상치 못한 서버 오류 발생: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
