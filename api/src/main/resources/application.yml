@@ -37,8 +37,17 @@ spring:
         show_sql: true        # 쿼리 로그 출력
   logging:
     level:
-      org.hibernate.SQL: DEBUG
-      org.hibernate.type.descriptor.sql: TRACE
+      com.tmarket: DEBUG                          # TMarket 프로젝트 디버깅
+      org.hibernate.SQL: DEBUG                    # Hibernate 실행 SQL 로그
+      org.hibernate.type.descriptor.sql: DEBUG    # Hibernate 실행 SQL 바인딩 추적 로그
+      org.springframework: DEBUG                  # Spring 프레임워크 전반 디버깅
+      org.springframework.beans: DEBUG              # Bean 생성 과정 추적
+      org.mybatis: DEBUG                          # MyBatis SQL 실행 로그
+      org.springframework.jdbc: DEBUG             # JDBC 디버깅
+
+property-file-config:
+  fileDirectory: D:/flab/workspace-tmk-dev/upload/file/
+  imageDirectory: D:/flab/workspace-tmk-dev/upload/image/
 
 property-test-config:
   authLogintUrl: /auth/login

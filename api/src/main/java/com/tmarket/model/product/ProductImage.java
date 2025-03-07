@@ -63,12 +63,13 @@ public class ProductImage {
     }
 
     public ProductImage(ProductImageDTO imageDTO, Products product) {
+        this.product = product;
+        this.registDate = imageDTO.getRegistDate();
+        this.modifyDate = imageDTO.getModifyDate();
+        this.deleteDate = imageDTO.getDeleteDate();
         this.actFileName = imageDTO.getActFileName();
         this.actFileOriginName = imageDTO.getActFileOriginName();
         this.imagePathName = imageDTO.getImagePathName();
         this.deleteYesNo = imageDTO.getDeleteYesNo();
-        this.product = product;
-        this.registDate = new Date();
-        this.modifyDate = new Date();
     }
 }

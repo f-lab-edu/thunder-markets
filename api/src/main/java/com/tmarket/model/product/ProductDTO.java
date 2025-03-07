@@ -27,4 +27,5 @@ public class ProductDTO {
     private Date deleteDate;
     private Long sellerId;
     private List<ProductImageDTO> productImages;
+
 }
