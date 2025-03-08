@@ -48,9 +48,6 @@ dependencies {
 
     // h2 데이터베이스
     implementation 'com.h2database:h2:2.3.232'
-
-    // log4j2 로깅
-    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 }
 
 compileJava.options.encoding = 'UTF-8'
@@ -61,5 +58,5 @@ tasks.withType(JavaCompile) {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()  
+    useJUnitPlatform()
 }
