@@ -23,7 +23,7 @@ public class ProductsService {
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
 
-    public ProductResponseDTO registerProduct(ProductDTO products, List<MultipartFile> images, String userId) {
+    public ProductResponseDTO registerProduct(ProductDTO products, List<MultipartFile> images, Long userId) {
 
         // 판매자 정보 조회
         Optional<User> sellerInfo = userRepository.findById(userId);
@@ -43,7 +43,7 @@ public class ProductsService {
         // MultipartFile를 ProductImage 엔티티로 변환
         List<ProductImage> productImages = new ArrayList<>();
         for (MultipartFile image : images) {
-            ProductImageDTO productImageDTO = objectStorageService.uploadFile(image); // 이미지 저장 후 URL 생성
+            ProductImageDTO productImageDTO = objectStorageService.uploadFile(image); // 이미지 저장 후 DTO에 보관
 
             // ProductImage 객체 생성 후 productId 할당
             ProductImage productImage = ProductImage.builder()

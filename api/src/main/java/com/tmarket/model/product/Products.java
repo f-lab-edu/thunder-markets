@@ -4,6 +4,7 @@ import com.tmarket.model.member.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Products {
     private String productContent;  // 상품 설명 (TEXT 타입)
 
     @Column(name = "product_price", nullable = false)
-    private Double productPrice;  // 상품 가격
+    private BigDecimal productPrice;  // 상품 가격
 
     @ElementCollection
     @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
