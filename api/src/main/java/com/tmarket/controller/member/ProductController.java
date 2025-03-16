@@ -33,16 +33,12 @@ public class ProductController {
             @RequestPart(value = "product", required = true) ProductDTO products,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @RequestHeader("Authorization") String token) {
-//        ProductDTO products;
-//        try {
-//            products = new ObjectMapper().readValue(productJsonData, ProductDTO.class);
-//        } catch (JsonProcessingException e) {
-//            return ResponseEntity.status(400).body(Map.of("message", "Invalid JSON format"));
-//        }
         logger.debug("이미지 개수: " + (images != null ? images.size() : "null"));
 
-        Long userId = authentication.validateTokenAndGetUserId(token);
-        ProductResponseDTO response = productsService.registerProduct(products, images, userId);
+        String email = authentication.validateTokenAndGetUserId(token);
+
+
+        ProductResponseDTO response = productsService.registerProduct(products, images, email);
         return ResponseEntity.status(201).body(Map.of("message", "상품 등록에 성공하였습니다.", "data", response));
     }
 }

@@ -1,5 +1,7 @@
 package com.tmarket.model.product;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tmarket.model.member.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,6 +49,15 @@ public class Products {
     @Column(name = "thumb_product_img", nullable = false, length = 255)
     private String thumbnailProductImage;  // 대표 이미지 URL
 
+    @Column(name = "thumb_origin_name")
+    private String thumbnailOriginName;    // 썸네일 원본파일명
+
+    @Column(name = "thumb_file_name")
+    private String thumbnailFileName;      // 썸네일 파일명(UUID)
+
+    @Column(name = "thumb_file_path")
+    private String thumbnailFilePath;      // 썸네일 Path
+
     @Column(name = "product_stts", nullable = false, length = 20)
     private String productStatus;  // 상품 상태 (예: 판매 중, 품절 등)
 
@@ -68,10 +79,12 @@ public class Products {
     // seller_id -> User 엔티티의 userId 참조 (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonBackReference // 자식 객체 직렬화 차단 (JSON 변환시 이 필드는 무시되고, 역참조만 유지된다.)
     private User seller; // 판매자 ID (User 테이블과 FK 관계)
 
     // 상품 이미지 리스트 (1:N 관계)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ProductImage> productImages;
 
     // 엔티티 생성 전 실행되는 메서드

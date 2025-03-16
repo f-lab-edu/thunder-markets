@@ -23,51 +23,45 @@ public class ProductsService {
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
 
-    public ProductResponseDTO registerProduct(ProductDTO products, List<MultipartFile> images, Long userId) {
+    public ProductResponseDTO registerProduct(ProductDTO products, List<MultipartFile> images, String email) {
 
         // 판매자 정보 조회
-        Optional<User> sellerInfo = userRepository.findById(userId);
-        if (sellerInfo.isEmpty()) {
+        User sellerInfo = userRepository.findByEmail(email);
+        if (sellerInfo == null) {
             throw new IllegalArgumentException("판매자를 찾을 수 없습니다.");
         }
-        User seller = sellerInfo.get();
 
         // 상품 정보에 판매자 정보 설정
-        products.setSellerId(seller.getUserId());
+        products.setSellerId(sellerInfo.getUserId());
 
         // ProductDTO를 Products 엔티티로 변환
-        Products product = new Products(products, seller);
+        Products product = new Products(products, sellerInfo);
+
+        // 첫 번째 이미지 추출 후 thumbnailProductImage로 설정 (50x50 리사이징)
+        if (!images.isEmpty()) {
+            MultipartFile firstImage = images.get(0);
+            ThumbnailImageDTO thumbnailInfo = objectStorageService.uploadAndResizeImage(firstImage, 500, 500);
+
+            product.setThumbnailProductImage(thumbnailInfo.getFullPath()); // 전체 경로
+            product.setThumbnailOriginName(thumbnailInfo.getOriginName()); // 원본 파일명
+            product.setThumbnailFileName(thumbnailInfo.getFileName());     // 저장된 파일명
+            product.setThumbnailFilePath(thumbnailInfo.getFilePath());     // 저장된 파일 경로
+        }
+
         // 상품 저장
         productsRepository.save(product);
 
         // MultipartFile를 ProductImage 엔티티로 변환
         List<ProductImage> productImages = new ArrayList<>();
         for (MultipartFile image : images) {
-            ProductImageDTO productImageDTO = objectStorageService.uploadFile(image); // 이미지 저장 후 DTO에 보관
-
-            // ProductImage 객체 생성 후 productId 할당
-            ProductImage productImage = ProductImage.builder()
-                    .product(product)  // productId 할당
-                    .registDate(productImageDTO.getRegistDate())
-                    .modifyDate(productImageDTO.getModifyDate())
-                    .deleteDate(productImageDTO.getDeleteDate())
-                    .actFileName(productImageDTO.getActFileName())
-                    .actFileOriginName(productImageDTO.getActFileOriginName())
-                    .imagePathName(productImageDTO.getImagePathName())
-                    .deleteYesNo(productImageDTO.getDeleteYesNo())
-                    .build();
-
+            ProductImage productImage = objectStorageService.uploadFile(image); // 이미지 저장 후 DTO에 보관
+            productImage.setProduct(product); // product 속성 설정
             productImages.add(productImage);
         }
 
         // 이미지 리스트 저장 및 엔티티를 DTO로 변환
         List<ProductImage> productImageEntity = productImageRepository.saveAll(productImages);
-        List<ProductImageDTO> productImageDTO = new ArrayList<>();
-        for (ProductImage productImage : productImageEntity) {
-            productImageDTO.add(new ProductImageDTO(productImage));
-        }
-
         // ProductResponseDTO 생성 및 반환
-        return new ProductResponseDTO(products, productImageDTO);
+        return new ProductResponseDTO(product, productImageEntity);
     }
 }

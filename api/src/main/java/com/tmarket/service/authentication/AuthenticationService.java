@@ -5,5 +5,5 @@ import com.tmarket.model.member.LoginDTO;
 public interface AuthenticationService {
     LoginDTO.LoginResponse authenticateUser(LoginDTO.LoginRequest request);
 
-    Long validateTokenAndGetUserId(String token);
+    String validateTokenAndGetUserId(String token);
 }

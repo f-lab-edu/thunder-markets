@@ -62,14 +62,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // JWT 토큰 발행
         String accessToken = Jwts.builder()
-                .setSubject(String.valueOf(user.getUserId()))
+                .setSubject(String.valueOf(user.getEmail()))
                 .claim("name", user.getUserName())
                 .setExpiration(expirationDate) // AccessToken 유효기간: 7일
                 .signWith(accessTokenKey, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .setSubject(String.valueOf(user.getUserId()))
+                .setSubject(String.valueOf(user.getEmail()))
                 .setExpiration(expirationDate) // RefreshToken 유효기간: 14일
                 .signWith(refreshTokenKey, SignatureAlgorithm.HS256)
                 .compact();
@@ -92,7 +92,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public Long validateTokenAndGetUserId(String token) {
+    public String validateTokenAndGetUserId(String token) {
         try {
             // 토큰을 파싱하고 서명을 검증하여 유효성을 확인
             Claims claims = Jwts.parserBuilder()
@@ -102,7 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .getBody();
 
             // 토큰에서 사용자 ID 추출
-            return Long.parseLong(claims.getSubject());
+            return claims.getSubject();
         } catch (ExpiredJwtException e) {
             throw new JwtExceptions.TokenExpiredException("토큰이 만료되었습니다.");
         } catch (UnsupportedJwtException e) {
