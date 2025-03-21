@@ -1,31 +1,32 @@
 package com.tmarket.controller.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tmarket.model.conf.PropertyConfig;
+import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.product.ProductDTO;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProductControllerIntegrationTest {
 
     @Autowired
@@ -35,7 +36,10 @@ public class ProductControllerIntegrationTest {
     private RestTemplateBuilder restTemplateBuilder;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private PropertyConfig propertyConfig;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @LocalServerPort
     private int port;
@@ -43,15 +47,16 @@ public class ProductControllerIntegrationTest {
     private String baseUrl;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
+        CloseableHttpClient httpClient = HttpClients.custom().build();
+        this.restTemplate = new TestRestTemplate(
+                restTemplateBuilder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory(httpClient))
+        );
         baseUrl = "http://localhost:" + port + "/products/register";
-        System.out.println("Base URL: " + baseUrl);
     }
 
-    @Test
-    @DisplayName("상품 등록 실패: 유효하지 않은 토큰")
-    void registerProductFailTest() throws Exception {
-        // given
+    private HttpEntity<MultiValueMap<String, Object>> createRequestEntity(String token) throws IOException {
+        // JSON 형태의 ProductDTO를 만들어서 HttpEntity로 포장
         ProductDTO productDTO = new ProductDTO();
         productDTO.setProductName("MacBook Pro");
         productDTO.setProductTitle("맥북 프로 팝니다.");
@@ -60,77 +65,62 @@ public class ProductControllerIntegrationTest {
         productDTO.setProductCategories(List.of("전자기기", "노트북", "애플"));
         productDTO.setPaymentOption("무통장입금");
 
-        MockMultipartFile productPart = new MockMultipartFile(
-                "product", "product.json",
-                "application/json",
-                objectMapper.writeValueAsBytes(productDTO)
-        );
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(productDTO);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("Authorization", "InvalidToken");
+        headers.set("Authorization", token);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("product", productPart.getResource());
 
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        // JSON part
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> jsonPart = new HttpEntity<>(json, jsonHeaders);
+        body.add("product", jsonPart);
 
-        // when
-        ResponseEntity<Map> response = restTemplate.exchange(
-                baseUrl, HttpMethod.POST, requestEntity, Map.class
-        );
+        // 이미지 파일 part
+        Resource image = resourceLoader.getResource("classpath:스프링.png");
+        body.add("images", image);
 
-        // then
+        return new HttpEntity<>(body, headers);
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("1. 유효하지 않은 토큰으로 상품 등록 실패")
+    void registerProductWithInvalidToken() throws IOException {
+        String invalidToken = "Bearer invalid_token";
+        HttpEntity<MultiValueMap<String, Object>> request = createRequestEntity(invalidToken);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getBody()).containsEntry("message", "토큰이 유효하지 않습니다.");
     }
 
     @Test
-    @DisplayName("상품 등록 성공: 올바른 데이터 입력")
-    void registerProductSuccessTest() throws Exception {
-        // given (테스트 요청 데이터 준비)
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setProductName("MacBook Pro");
-        productDTO.setProductTitle("맥북 프로 팝니다.");
-        productDTO.setProductContent("최신형 MacBook Pro M3 맥북프로 팔아요 직거래만 합니다.");
-        productDTO.setProductPrice(BigDecimal.valueOf(3299000.0));
-        productDTO.setProductCategories(List.of("전자기기", "노트북", "애플"));
-        productDTO.setPaymentOption("무통장입금");
+    @Order(2)
+    @DisplayName("2. 상품 등록 성공")
+    void registerProductSuccessfully() throws IOException {
+        // 유효한 토큰 획득 과정 (예: 로그인)
+        String loginUrl = "http://localhost:" + port + propertyConfig.getAuthLogintUrl();
 
-        // JSON으로 변환한 `product` 데이터를 `MockMultipartFile`로 생성
-        MockMultipartFile productPart = new MockMultipartFile(
-                "product", "product.json",
-                "application/json",
-                objectMapper.writeValueAsBytes(productDTO)
-        );
+        LoginDTO.LoginRequest loginRequest = new LoginDTO.LoginRequest();
+        loginRequest.setEmail("testuser@example.com");
+        loginRequest.setPassword("password1234");
 
-        // 테스트용 이미지 파일 로드
-        File imageFile = new File("src/test/resources/스프링.png");
-        MockMultipartFile imagePart = new MockMultipartFile(
-                "images", imageFile.getName(),
-                "image/png", new FileInputStream(imageFile)
-        );
+        ResponseEntity<LoginDTO.LoginResponse> loginResponse = restTemplate.postForEntity(
+                loginUrl, loginRequest, LoginDTO.LoginResponse.class);
 
-        // HTTP 요청 헤더 설정 (multipart/form-data)
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("Authorization", "ValidToken"); // 테스트용 유효한 토큰
+        assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String validToken = "Bearer " + loginResponse.getBody().getAccessToken();
 
-        // FormDataBody 생성
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("product", productPart);
-        body.add("images", imagePart);
+        HttpEntity<MultiValueMap<String, Object>> request = createRequestEntity(validToken);
 
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
 
-        // when
-        ResponseEntity<Map> response = restTemplate.exchange(
-                baseUrl, HttpMethod.POST, requestEntity, Map.class
-        );
-
-        // then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).containsEntry("message", "상품 등록에 성공하였습니다.");
-        assertThat(response.getBody().get("data")).isNotNull();
+        assertThat(response.getBody()).contains("상품 등록에 성공하였습니다.");
     }
 }

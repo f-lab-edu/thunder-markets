@@ -1,6 +1,5 @@
 package com.tmarket.model.product;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +17,7 @@ public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_img_idx")
-    private Long productImgageIndex; // 상품 이미지 일련번호 (PK, auto_increment)
+    private Long productImageIndex; // 상품 이미지 일련번호 (PK, auto_increment)
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "reg_dt", nullable = false, updatable = false)
@@ -47,7 +46,7 @@ public class ProductImage {
     // products 테이블의 product_id를 참조하는 FK
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @JsonBackReference
+    //@JsonBackReference
     private Products product; // 상품 정보
 
     // 엔티티 생성 전 실행되는 메서드
@@ -74,4 +73,15 @@ public class ProductImage {
         this.imagePathName = imageDTO.getImagePathName();
         this.deleteYesNo = imageDTO.getDeleteYesNo();
     }
+
+    public ProductImageDTO toDTO() {
+        return ProductImageDTO.builder()
+                .productImageIndex(this.productImageIndex)
+                .actFileName(this.actFileName)
+                .actFileOriginName(this.actFileOriginName)
+                .imagePathName(this.imagePathName)
+                .deleteYesNo(this.deleteYesNo)
+                .build();
+    }
+
 }

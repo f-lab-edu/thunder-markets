@@ -111,7 +111,7 @@ public class ObjectStorageServiceWithNoCloud implements ObjectStorageService {
         } catch (Exception e) {
             logger.error("파일 저장 실패 (Exception): {}", e.getMessage(), e);
         }
-        productImage.setProductImgageIndex(null);
+        productImage.setProductImageIndex(null);
         productImage.setRegistDate(new Date());
         productImage.setModifyDate(null);
         productImage.setDeleteDate(null);

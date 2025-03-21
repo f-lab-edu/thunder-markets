@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 public class ProductImageDTO {
 
-    private Long productImgageIndex;
+    private Long productImageIndex;
     private Date registDate;
     private Date modifyDate;
     private Date deleteDate;
@@ -24,7 +24,7 @@ public class ProductImageDTO {
 
     // 사용자 정의 Constructor
     public ProductImageDTO(ProductImage productImage) {
-        this.productImgageIndex = productImage.getProductImgageIndex();
+        this.productImageIndex = productImage.getProductImageIndex();
         this.registDate = productImage.getRegistDate();
         this.modifyDate = productImage.getModifyDate();
         this.deleteDate = productImage.getDeleteDate();

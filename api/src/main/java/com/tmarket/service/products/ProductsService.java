@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class ProductsService {
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
 
-    public ProductResponseDTO registerProduct(ProductDTO products, List<MultipartFile> images, String email) {
+    public ProductResponseDTO registerProduct(ProductDTO productDto, List<MultipartFile> images, String email) {
 
         // 판매자 정보 조회
         User sellerInfo = userRepository.findByEmail(email);
@@ -32,10 +34,10 @@ public class ProductsService {
         }
 
         // 상품 정보에 판매자 정보 설정
-        products.setSellerId(sellerInfo.getUserId());
+        //productDto.setSellerId(sellerInfo.getUserId()); - 불필요하므로 제거
 
         // ProductDTO를 Products 엔티티로 변환
-        Products product = new Products(products, sellerInfo);
+        Products product = new Products(productDto, sellerInfo);
 
         // 첫 번째 이미지 추출 후 thumbnailProductImage로 설정 (50x50 리사이징)
         if (!images.isEmpty()) {
@@ -49,7 +51,8 @@ public class ProductsService {
         }
 
         // 상품 저장
-        productsRepository.save(product);
+        product = productsRepository.save(product);
+        productDto = product.toDTO();
 
         // MultipartFile를 ProductImage 엔티티로 변환
         List<ProductImage> productImages = new ArrayList<>();
@@ -60,8 +63,10 @@ public class ProductsService {
         }
 
         // 이미지 리스트 저장 및 엔티티를 DTO로 변환
-        List<ProductImage> productImageEntity = productImageRepository.saveAll(productImages);
+        List<ProductImage> productImage = productImageRepository.saveAll(productImages);
+        List<ProductImageDTO> productImageDto = productImage.stream().map(ProductImageDTO::new).collect(Collectors.toList());
+
         // ProductResponseDTO 생성 및 반환
-        return new ProductResponseDTO(product, productImageEntity);
+        return new ProductResponseDTO(productDto, productImageDto);
     }
 }

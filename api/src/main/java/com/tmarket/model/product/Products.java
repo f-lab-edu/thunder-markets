@@ -1,7 +1,5 @@
 package com.tmarket.model.product;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.tmarket.model.member.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -79,12 +77,12 @@ public class Products {
     // seller_id -> User 엔티티의 userId 참조 (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    @JsonBackReference // 자식 객체 직렬화 차단 (JSON 변환시 이 필드는 무시되고, 역참조만 유지된다.)
+    //@JsonBackReference // 자식 객체 직렬화 차단 (JSON 변환시 이 필드는 무시되고, 역참조만 유지된다.)
     private User seller; // 판매자 ID (User 테이블과 FK 관계)
 
     // 상품 이미지 리스트 (1:N 관계)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    //@JsonManagedReference
     private List<ProductImage> productImages;
 
     // 엔티티 생성 전 실행되는 메서드
@@ -121,4 +119,27 @@ public class Products {
                         .collect(Collectors.toList()) :
                 new ArrayList<>();
     }
+
+    public ProductDTO toDTO() {
+        return ProductDTO.builder()
+                .productId(this.productId)
+                .productName(this.productName)
+                .productTitle(this.productTitle)
+                .productContent(this.productContent)
+                .productPrice(this.productPrice)
+                .productCategories(this.productCategories)
+                .paymentOption(this.paymentOption)
+                .thumbnailProductImage(this.thumbnailProductImage)
+                .productStatus(this.productStatus)
+                .isActive(this.isActive)
+                .registDate(this.registDate)
+                .modifyDate(this.modifyDate)
+                .deleteDate(this.deleteDate)
+                .sellerId(this.seller != null ? this.seller.getUserId() : null)  // seller가 존재하는 경우만 ID 저장
+                .productImages(this.productImages != null ?
+                        this.productImages.stream().map(ProductImage::toDTO).collect(Collectors.toList()) :
+                        new ArrayList<>())
+                .build();
+    }
+
 }
