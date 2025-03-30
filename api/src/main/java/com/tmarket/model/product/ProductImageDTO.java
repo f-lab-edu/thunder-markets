@@ -23,14 +23,14 @@ public class ProductImageDTO {
     private char deleteYesNo;
 
     // 사용자 정의 Constructor
-    public ProductImageDTO(ProductImage productImage) {
-        this.productImageIndex = productImage.getProductImageIndex();
-        this.registDate = productImage.getRegistDate();
-        this.modifyDate = productImage.getModifyDate();
-        this.deleteDate = productImage.getDeleteDate();
-        this.actFileName = productImage.getActFileName();
-        this.actFileOriginName = productImage.getActFileOriginName();
-        this.imagePathName = productImage.getImagePathName();
-        this.deleteYesNo = productImage.getDeleteYesNo();
-    }
+//    public ProductImageDTO(ProductImage productImage) {
+//        this.productImageIndex = productImage.getProductImageIndex();
+//        this.registDate = productImage.getRegistDate();
+//        this.modifyDate = productImage.getModifyDate();
+//        this.deleteDate = productImage.getDeleteDate();
+//        this.actFileName = productImage.getActFileName();
+//        this.actFileOriginName = productImage.getActFileOriginName();
+//        this.imagePathName = productImage.getImagePathName();
+//        this.deleteYesNo = productImage.getDeleteYesNo();
+//    }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +35,9 @@ public class ProductsService {
         // 상품 정보에 판매자 정보 설정
         //productDto.setSellerId(sellerInfo.getUserId()); - 불필요하므로 제거
 
-        // ProductDTO를 Products 엔티티로 변환
-        Products product = new Products(productDto, sellerInfo);
+        // ProductDTO를 Product 엔티티로 변환
+        Product product = ProductDtoMapper.INSTANCE.productDTOtoProduct(productDto, sellerInfo);
+        // Product product = new Product(productDto, sellerInfo);
 
         // 첫 번째 이미지 추출 후 thumbnailProductImage로 설정 (50x50 리사이징)
         if (!images.isEmpty()) {
@@ -52,7 +52,7 @@ public class ProductsService {
 
         // 상품 저장
         product = productsRepository.save(product);
-        productDto = product.toDTO();
+        ProductDTO productDtoResponse = ProductMapper.INSTANCE.productToProductDTO(product); // ProductDTO를 Product 엔티티로 변환
 
         // MultipartFile를 ProductImage 엔티티로 변환
         List<ProductImage> productImages = new ArrayList<>();
@@ -64,9 +64,11 @@ public class ProductsService {
 
         // 이미지 리스트 저장 및 엔티티를 DTO로 변환
         List<ProductImage> productImage = productImageRepository.saveAll(productImages);
-        List<ProductImageDTO> productImageDto = productImage.stream().map(ProductImageDTO::new).collect(Collectors.toList());
+//        List<ProductImageDTO> productImageDto = productImage.stream().map(ProductImageDTO::new).collect(Collectors.toList());
+        List<ProductImageDTO> productImageDtoResponse = ProductImageMapper.INSTANCE.productImageToProductImageDTO(productImage);
+
 
         // ProductResponseDTO 생성 및 반환
-        return new ProductResponseDTO(productDto, productImageDto);
+        return new ProductResponseDTO(productDtoResponse, productImageDtoResponse);
     }
 }

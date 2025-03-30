@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class PropertyConfig {
     private String authLogintUrl;
     private String port;
+    private String productRegisterUrl;
 }

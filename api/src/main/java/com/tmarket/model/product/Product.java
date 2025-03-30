@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,7 +15,7 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @Table(name = "products")
-public class Products {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,10 +34,11 @@ public class Products {
     @Column(name = "product_price", nullable = false)
     private BigDecimal productPrice;  // 상품 가격
 
-    @ElementCollection
-    @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "category_name")
-    private List<String> productCategories;  // 카테고리 리스트
+    // 제외
+//    @ElementCollection
+//    @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
+//    @Column(name = "category_name")
+//    private List<String> productCategories;  // 카테고리 리스트
 
     @Column(name = "payment_option", nullable = false, length = 50)
     private String paymentOption;  // 결제 옵션
@@ -77,12 +76,10 @@ public class Products {
     // seller_id -> User 엔티티의 userId 참조 (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    //@JsonBackReference // 자식 객체 직렬화 차단 (JSON 변환시 이 필드는 무시되고, 역참조만 유지된다.)
     private User seller; // 판매자 ID (User 테이블과 FK 관계)
 
     // 상품 이미지 리스트 (1:N 관계)
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JsonManagedReference
     private List<ProductImage> productImages;
 
     // 엔티티 생성 전 실행되는 메서드
@@ -99,47 +96,25 @@ public class Products {
     }
 
 
-    public Products(ProductDTO productDTO, User seller) {
-        this.productName = productDTO.getProductName();
-        this.productTitle = productDTO.getProductTitle();
-        this.productContent = productDTO.getProductContent();
-        this.productPrice = productDTO.getProductPrice();
-        this.productCategories = productDTO.getProductCategories();
-        this.paymentOption = productDTO.getPaymentOption();
-        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
-        this.productStatus = productDTO.getProductStatus();
-        this.isActive = productDTO.getIsActive();
-        this.registDate = productDTO.getRegistDate();
-        this.modifyDate = productDTO.getModifyDate();
-        this.deleteDate = productDTO.getDeleteDate();
-        this.seller = seller;
-        this.productImages = productDTO.getProductImages() != null ?
-                productDTO.getProductImages().stream()
-                        .map(imageDTO -> new ProductImage(imageDTO, this))
-                        .collect(Collectors.toList()) :
-                new ArrayList<>();
-    }
-
-    public ProductDTO toDTO() {
-        return ProductDTO.builder()
-                .productId(this.productId)
-                .productName(this.productName)
-                .productTitle(this.productTitle)
-                .productContent(this.productContent)
-                .productPrice(this.productPrice)
-                .productCategories(this.productCategories)
-                .paymentOption(this.paymentOption)
-                .thumbnailProductImage(this.thumbnailProductImage)
-                .productStatus(this.productStatus)
-                .isActive(this.isActive)
-                .registDate(this.registDate)
-                .modifyDate(this.modifyDate)
-                .deleteDate(this.deleteDate)
-                .sellerId(this.seller != null ? this.seller.getUserId() : null)  // seller가 존재하는 경우만 ID 저장
-                .productImages(this.productImages != null ?
-                        this.productImages.stream().map(ProductImage::toDTO).collect(Collectors.toList()) :
-                        new ArrayList<>())
-                .build();
-    }
+//    public Product(ProductDTO productDTO, User seller) {
+//        this.productName = productDTO.getProductName();
+//        this.productTitle = productDTO.getProductTitle();
+//        this.productContent = productDTO.getProductContent();
+//        this.productPrice = productDTO.getProductPrice();
+////        this.productCategories = productDTO.getProductCategories();
+//        this.paymentOption = productDTO.getPaymentOption();
+//        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
+//        this.productStatus = productDTO.getProductStatus();
+//        this.isActive = productDTO.getIsActive();
+//        this.registDate = productDTO.getRegistDate();
+//        this.modifyDate = productDTO.getModifyDate();
+//        this.deleteDate = productDTO.getDeleteDate();
+//        this.seller = seller;
+//        this.productImages = productDTO.getProductImages() != null ?
+//                productDTO.getProductImages().stream()
+//                        .map(imageDTO -> new ProductImage(imageDTO, this))
+//                        .collect(Collectors.toList()) :
+//                new ArrayList<>();
+//    }
 
 }

@@ -37,7 +37,6 @@ public class ProductController {
 
         String email = authentication.validateTokenAndGetUserId(token);
 
-
         ProductResponseDTO response = productsService.registerProduct(products, images, email);
         return ResponseEntity.status(201).body(Map.of("message", "상품 등록에 성공하였습니다.", "data", response));
     }

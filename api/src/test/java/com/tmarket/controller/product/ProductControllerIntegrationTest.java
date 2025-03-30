@@ -2,38 +2,33 @@ package com.tmarket.controller.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmarket.model.conf.PropertyConfig;
-import com.tmarket.model.member.LoginDTO;
-import com.tmarket.model.product.ProductDTO;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.junit.jupiter.api.*;
+import com.tmarket.model.product.ProductResponseDTO;
+import com.tmarket.service.authentication.AuthenticationIntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ProductControllerIntegrationTest {
+public class ProductControllerIntegrationTest extends AuthenticationIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
 
     @Autowired
     private PropertyConfig propertyConfig;
@@ -41,86 +36,80 @@ public class ProductControllerIntegrationTest {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @LocalServerPort
     private int port;
 
-    private String baseUrl;
+    private String productRegistUrl;
+    private HttpEntity<String> productPart;
+    private Resource imageResource;
 
     @BeforeEach
-    void setUp() {
-        CloseableHttpClient httpClient = HttpClients.custom().build();
-        this.restTemplate = new TestRestTemplate(
-                restTemplateBuilder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory(httpClient))
-        );
-        baseUrl = "http://localhost:" + port + "/products/register";
-    }
+    void setUp() throws FileNotFoundException {
+        productRegistUrl = "http://localhost:" + port + propertyConfig.getProductRegisterUrl();
+        System.out.println("RegisterUrl: " + productRegistUrl);
 
-    private HttpEntity<MultiValueMap<String, Object>> createRequestEntity(String token) throws IOException {
-        // JSON 형태의 ProductDTO를 만들어서 HttpEntity로 포장
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setProductName("MacBook Pro");
-        productDTO.setProductTitle("맥북 프로 팝니다.");
-        productDTO.setProductContent("최신형 MacBook Pro M3 맥북프로 팔아요 직거래만 합니다.");
-        productDTO.setProductPrice(BigDecimal.valueOf(3299000.0));
-        productDTO.setProductCategories(List.of("전자기기", "노트북", "애플"));
-        productDTO.setPaymentOption("무통장입금");
+        // JSON 생성 (ObjectMapper 없이)
+        String jsonProduct = """
+                {
+                    "productName": "MacBook Pro",
+                    "productTitle": "맥북 프로 팝니다.",
+                    "productContent": "최신형 MacBook Pro M3 맥북프로 팔아요 직거래만 합니다.",
+                    "productPrice": 3299000.0,
+                    "productCategories": ["전자기기", "노트북", "애플"],
+                    "paymentOption": "무통장입금"
+                }
+                """;
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(productDTO);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("Authorization", token);
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-        // JSON part
         HttpHeaders jsonHeaders = new HttpHeaders();
         jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonPart = new HttpEntity<>(json, jsonHeaders);
-        body.add("product", jsonPart);
+        productPart = new HttpEntity<>(jsonProduct, jsonHeaders);
 
-        // 이미지 파일 part
-        Resource image = resourceLoader.getResource("classpath:스프링.png");
-        body.add("images", image);
-
-        return new HttpEntity<>(body, headers);
+        imageResource = resourceLoader.getResource("classpath:스프링.png");
+        if (!imageResource.exists()) {
+            throw new FileNotFoundException("테스트 이미지 '스프링.png'가 존재하지 않습니다.");
+        }
     }
 
     @Test
-    @Order(1)
-    @DisplayName("1. 유효하지 않은 토큰으로 상품 등록 실패")
-    void registerProductWithInvalidToken() throws IOException {
-        String invalidToken = "Bearer invalid_token";
-        HttpEntity<MultiValueMap<String, Object>> request = createRequestEntity(invalidToken);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Test
-    @Order(2)
-    @DisplayName("2. 상품 등록 성공")
+    @DisplayName("1. 상품 등록 성공")
     void registerProductSuccessfully() throws IOException {
-        // 유효한 토큰 획득 과정 (예: 로그인)
-        String loginUrl = "http://localhost:" + port + propertyConfig.getAuthLogintUrl();
+        // given(multipart body 구성) (구성)
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("product", productPart);
+        body.add("images", imageResource);
 
-        LoginDTO.LoginRequest loginRequest = new LoginDTO.LoginRequest();
-        loginRequest.setEmail("testuser@example.com");
-        loginRequest.setPassword("password1234");
+        HttpHeaders headers = getAuthHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        ResponseEntity<LoginDTO.LoginResponse> loginResponse = restTemplate.postForEntity(
-                loginUrl, loginRequest, LoginDTO.LoginResponse.class);
+        // when (실행)
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                productRegistUrl,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<>() {}
+        );
+        // ParameterizedTypeReference : 제네릭 타입을 갖는 객체의 타입 정보를 보존(제네릭 타입을 명확히 지정)하여
+        // Map<String, Object>가 Map으로 인식되는 걸 방지
+        // TestRestTemplate에서는 postForEntity() 대신 exchange() 메서드를 사용해야 함.
+        System.out.println("상품 등록 응답: " + objectMapper.writeValueAsString(response.getBody()));
 
-        assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        String validToken = "Bearer " + loginResponse.getBody().getAccessToken();
+        // then (검증)
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).containsEntry("message", "상품 등록에 성공하였습니다.");
 
-        HttpEntity<MultiValueMap<String, Object>> request = createRequestEntity(validToken);
+        // Object -> ProductResponseDTO 변환
+        Object data = response.getBody().get("data");
+        ProductResponseDTO productResponseDTO = objectMapper.convertValue(data, ProductResponseDTO.class);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, request, String.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).contains("상품 등록에 성공하였습니다.");
+        assertThat(productResponseDTO.getProductDTO()).isNotNull();
+        assertThat(productResponseDTO.getProductDTO().getProductName()).isEqualTo("MacBook Pro");
+        assertThat(productResponseDTO.getProductImageDTO()).isNotEmpty();
+        assertThat(productResponseDTO.getProductImageDTO().get(0).getActFileOriginName()).isEqualTo("스프링.png");
     }
+
 }

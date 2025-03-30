@@ -11,5 +11,5 @@ import java.util.List;
 @Builder
 public class ProductResponseDTO {
     private ProductDTO productDTO;
-    private List<ProductImageDTO> productImages;
+    private List<ProductImageDTO> productImageDTO;
 }

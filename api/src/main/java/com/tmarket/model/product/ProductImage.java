@@ -46,8 +46,7 @@ public class ProductImage {
     // products 테이블의 product_id를 참조하는 FK
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    //@JsonBackReference
-    private Products product; // 상품 정보
+    private Product product; // 상품 정보
 
     // 엔티티 생성 전 실행되는 메서드
     @PrePersist
@@ -63,25 +62,14 @@ public class ProductImage {
         this.modifyDate = new Date();
     }
 
-    public ProductImage(ProductImageDTO imageDTO, Products product) {
-        this.product = product;
-        this.registDate = imageDTO.getRegistDate();
-        this.modifyDate = imageDTO.getModifyDate();
-        this.deleteDate = imageDTO.getDeleteDate();
-        this.actFileName = imageDTO.getActFileName();
-        this.actFileOriginName = imageDTO.getActFileOriginName();
-        this.imagePathName = imageDTO.getImagePathName();
-        this.deleteYesNo = imageDTO.getDeleteYesNo();
-    }
-
-    public ProductImageDTO toDTO() {
-        return ProductImageDTO.builder()
-                .productImageIndex(this.productImageIndex)
-                .actFileName(this.actFileName)
-                .actFileOriginName(this.actFileOriginName)
-                .imagePathName(this.imagePathName)
-                .deleteYesNo(this.deleteYesNo)
-                .build();
-    }
-
+//    public ProductImage(ProductImageDTO imageDTO, Product product) {
+//        this.product = product;
+//        this.registDate = imageDTO.getRegistDate();
+//        this.modifyDate = imageDTO.getModifyDate();
+//        this.deleteDate = imageDTO.getDeleteDate();
+//        this.actFileName = imageDTO.getActFileName();
+//        this.actFileOriginName = imageDTO.getActFileOriginName();
+//        this.imagePathName = imageDTO.getImagePathName();
+//        this.deleteYesNo = imageDTO.getDeleteYesNo();
+//    }
 }

@@ -27,14 +27,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private UserRepository userRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
-   private final Map<String, UserDTO> userInfoStore = new ConcurrentHashMap<>();
+    private final Map<String, UserDTO> userInfoStore = new ConcurrentHashMap<>();
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Spring Security에서는 BCrypt.checkpw() 대신 BCryptPasswordEncoder 사용을 권장힘
     private final Key accessTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final Key refreshTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final Date expirationDate = new Date(System.currentTimeMillis() + 604800000);
-
-    public AuthenticationServiceImpl() { // 생성자로 DTO에 하드코딩 데이터 주입
-    }
 
     @Override
     public LoginDTO.LoginResponse authenticateUser(LoginDTO.LoginRequest request) {

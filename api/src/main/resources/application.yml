@@ -52,3 +52,4 @@ property-file-config:
 property-test-config:
   authLogintUrl: /auth/login
   port: 8080
+  productRegisterUrl: /products/register
