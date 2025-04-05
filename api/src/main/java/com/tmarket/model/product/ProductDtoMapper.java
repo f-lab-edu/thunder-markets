@@ -14,7 +14,7 @@ public interface ProductDtoMapper {
     @Mapping(target = "seller", ignore = true)
     Product productDTOtoProduct(ProductDTO productDTO);
 
-    // Custom Method PArameter방식으로 seller를 따로 주입
+    // Custom Method Parameter방식으로 seller를 따로 주입
     default Product productDTOtoProduct(ProductDTO productDTO, User seller) {
         Product product = productDTOtoProduct(productDTO);
         product.setSeller(seller);

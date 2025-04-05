@@ -1,9 +1,8 @@
 package com.tmarket.controller.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tmarket.model.conf.PropertyConfig;
 import com.tmarket.model.product.ProductResponseDTO;
-import com.tmarket.service.authentication.AuthenticationIntegrationTest;
+import com.tmarket.service.authentication.AuthenticationIntegrationTestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,13 +24,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProductControllerIntegrationTest extends AuthenticationIntegrationTest {
-
+class ProductControllerIntegrationTest extends AuthenticationIntegrationTestUtil {
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Autowired
-    private PropertyConfig propertyConfig;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -48,7 +43,7 @@ public class ProductControllerIntegrationTest extends AuthenticationIntegrationT
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        productRegistUrl = "http://localhost:" + port + propertyConfig.getProductRegisterUrl();
+        productRegistUrl = "http://localhost:" + port + "/products/register";
         System.out.println("RegisterUrl: " + productRegistUrl);
 
         // JSON 생성 (ObjectMapper 없이)
@@ -98,7 +93,7 @@ public class ProductControllerIntegrationTest extends AuthenticationIntegrationT
         System.out.println("상품 등록 응답: " + objectMapper.writeValueAsString(response.getBody()));
 
         // then (검증)
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).containsEntry("message", "상품 등록에 성공하였습니다.");
 

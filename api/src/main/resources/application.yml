@@ -48,8 +48,3 @@ spring:
 property-file-config:
   fileDirectory: D:/flab/workspace-tmk-dev/upload/file/
   imageDirectory: D:/flab/workspace-tmk-dev/upload/image/
-
-property-test-config:
-  authLogintUrl: /auth/login
-  port: 8080
-  productRegisterUrl: /products/register

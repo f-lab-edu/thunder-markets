@@ -1,7 +1,6 @@
 package com.tmarket;
 
 import com.tmarket.model.conf.FileUploadConfig;
-import com.tmarket.model.conf.PropertyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 
 @SpringBootApplication
-@EnableConfigurationProperties({PropertyConfig.class, FileUploadConfig.class})
+@EnableConfigurationProperties(FileUploadConfig.class)
 public class ApiApplication {
     private static final Logger logger = LoggerFactory.getLogger(ApiApplication.class);
 

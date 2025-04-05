@@ -9,6 +9,7 @@ import com.tmarket.model.member.UserDTO;
 import com.tmarket.repository.member.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -28,7 +30,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
     private final Map<String, UserDTO> userInfoStore = new ConcurrentHashMap<>();
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Spring Security에서는 BCrypt.checkpw() 대신 BCryptPasswordEncoder 사용을 권장힘
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Spring Security에서는 BCrypt.checkpw() 대신 BCryptPasswordEncoder 사용을 권장함
     private final Key accessTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final Key refreshTokenKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final Date expirationDate = new Date(System.currentTimeMillis() + 604800000);
@@ -88,14 +90,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    private String extractToken(String token) {
+        return Optional.ofNullable(token)
+                .filter(t -> t.startsWith("Bearer "))
+                .map(t -> t.substring(7))
+                .orElseThrow(() -> new JwtExceptions.InvalidTokenException("유효하지 않은 토큰입니다."));
+    }
+
     @Override
     public String validateTokenAndGetUserId(String token) {
+
         try {
             // 토큰을 파싱하고 서명을 검증하여 유효성을 확인
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(accessTokenKey)
                     .build()
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(extractToken(token))
                     .getBody();
 
             // 토큰에서 사용자 ID 추출

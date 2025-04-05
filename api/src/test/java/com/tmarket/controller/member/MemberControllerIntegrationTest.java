@@ -1,7 +1,6 @@
 package com.tmarket.controller.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tmarket.model.conf.PropertyConfig;
 import com.tmarket.model.member.LoginDTO;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -28,9 +27,6 @@ public class MemberControllerIntegrationTest {
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
 
-    @Autowired // @Value 대신 @ConfigurationProperties 사용
-    private PropertyConfig propertyConfig;
-
     @LocalServerPort
     private int port;  // 🔹 테스트 실행 시 할당되는 랜덤 포트
 
@@ -43,7 +39,7 @@ public class MemberControllerIntegrationTest {
                 restTemplateBuilder.requestFactory(() -> new HttpComponentsClientHttpRequestFactory(httpClient))
         );
 
-        baseUrl = "http://localhost:" + port + propertyConfig.getAuthLogintUrl();
+        baseUrl = "http://localhost:" + port + "/auth/login";
         System.out.println("Base URL: " + baseUrl);
     }
 
