@@ -10,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -32,10 +36,10 @@ public class ProductController {
     public ResponseEntity<Map<String, Object>> registerProduct(
             @RequestPart(value = "product", required = true) ProductDTO products,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestHeader("Authorization") String token) {
+            Authentication authentication) {
         logger.debug("이미지 개수: " + (images != null ? images.size() : "null"));
 
-        String email = authentication.validateTokenAndGetUserId(token);
+        String email = authentication.getName();
 
         ProductResponseDTO response = productsService.registerProduct(products, images, email);
         return ResponseEntity.status(201).body(Map.of("message", "상품 등록에 성공하였습니다.", "data", response));

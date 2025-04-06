@@ -37,6 +37,7 @@ public class AuthenticationIntegrationTestUtil {
         request.setEmail(email);
         request.setPassword(password);
 
+        // 얘만 멤버테스트 멤버 통합 테스트 빌더로 썼던 걸로 넣어야 할듯
         ResponseEntity<LoginDTO.LoginResponse> response = restTemplate.postForEntity(
                 loginUrl, request, LoginDTO.LoginResponse.class);
 

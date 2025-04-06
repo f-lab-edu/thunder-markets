@@ -9,11 +9,12 @@ import com.tmarket.repository.member.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -22,7 +23,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Component
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private UserRepository userRepository;
@@ -226,5 +226,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } catch (JwtException e) {
             throw new JwtExceptions.InvalidTokenException("유효하지 않은 토큰입니다.");
         }
+    }
+
+    @Override
+    public ResponseEntity<LoginDTO.LoginResponse> logoutUser(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        String extractToken = extractToken(token);
+
+        String email = Jwts.parserBuilder()
+                .setSigningKey(accessTokenKey)
+                .build()
+                .parseClaimsJws(extractToken)
+                .getBody()
+                .getSubject();
+
+        redisTemplate.delete(REDIS_ACCESS_TOKEN_PREFIX + email);
+        redisTemplate.delete(REDIS_REFRESH_TOKEN_PREFIX + email);
+
+        return ResponseEntity.ok().build();
     }
 }

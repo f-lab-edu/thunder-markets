@@ -5,6 +5,7 @@ import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.LoginDTO.LoginRequest;
 import com.tmarket.model.member.LoginDTO.LoginResponse;
 import com.tmarket.service.authentication.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +52,7 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<LoginResponse> logoutUser(
-            @RequestBody LoginRequest request) throws RuntimeException {
-
-        logger.info("로그인 요청: {}", request.getClass());
-
-        return null;
+    public ResponseEntity<LoginResponse> logoutUser(HttpServletRequest request) {
+        return authenticationService.logoutUser(request);
     }
 }
