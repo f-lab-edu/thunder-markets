@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProductResponseDTO {
-    private ProductDTO product;
-    private List<ProductImageDTO> productImages;
+    private ProductDTO productDTO;
+    private List<ProductImageDTO> productImageDTO;
 }

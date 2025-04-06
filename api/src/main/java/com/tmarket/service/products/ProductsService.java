@@ -5,52 +5,70 @@ import com.tmarket.model.product.*;
 import com.tmarket.repository.member.UserRepository;
 import com.tmarket.repository.product.ProductImageRepository;
 import com.tmarket.repository.product.ProductsRepository;
+import com.tmarket.service.util.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProductsService {
+
+    private final ObjectStorageService objectStorageService;
     private final ProductsRepository productsRepository;
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
 
+    public ProductResponseDTO registerProduct(ProductDTO productDto, List<MultipartFile> images, String email) {
 
-    public ProductResponseDTO registerProduct(ProductDTO products, List<ProductImageDTO> images, String userId) {
         // 판매자 정보 조회
-        Optional<User> sellerInfo = userRepository.findById(userId);
-        if (sellerInfo.isEmpty()) {
+        User sellerInfo = userRepository.findByEmail(email);
+        if (sellerInfo == null) {
             throw new IllegalArgumentException("판매자를 찾을 수 없습니다.");
         }
-        User seller = sellerInfo.get();
 
         // 상품 정보에 판매자 정보 설정
-        products.setSellerId(seller.getUserId());
+        //productDto.setSellerId(sellerInfo.getUserId()); - 불필요하므로 제거
 
-        // ProductDTO를 Products 엔티티로 변환
-        Products product = new Products(products, seller);
+        // ProductDTO를 Product 엔티티로 변환
+        Product product = ProductDtoMapper.INSTANCE.productDTOtoProduct(productDto, sellerInfo);
+        // Product product = new Product(productDto, sellerInfo);
 
-        // ProductImageDTO를 ProductImage 엔티티로 변환
-        //ProductImage productImage = new ProductImage(images, product);
-        // ProductImageDTO 리스트를 ProductImage 엔티티 리스트로 변환
-        List<ProductImage> productImages = images.stream()
-                .map(imageDTO -> new ProductImage(imageDTO, product))
-                .collect(Collectors.toList());
+        // 첫 번째 이미지 추출 후 thumbnailProductImage로 설정 (50x50 리사이징)
+        if (!images.isEmpty()) {
+            MultipartFile firstImage = images.get(0);
+            ThumbnailImageDTO thumbnailInfo = objectStorageService.uploadAndResizeImage(firstImage, 500, 500);
+
+            product.setThumbnailProductImage(thumbnailInfo.getFullPath()); // 전체 경로
+            product.setThumbnailOriginName(thumbnailInfo.getOriginName()); // 원본 파일명
+            product.setThumbnailFileName(thumbnailInfo.getFileName());     // 저장된 파일명
+            product.setThumbnailFilePath(thumbnailInfo.getFilePath());     // 저장된 파일 경로
+        }
 
         // 상품 저장
-        productsRepository.save(product);
-        // 이미지 리스트 저장
-        productImageRepository.saveAll(productImages);
-//        productImageRepository.save(productImage);
+        product = productsRepository.save(product);
+        ProductDTO productDtoResponse = ProductMapper.INSTANCE.productToProductDTO(product); // ProductDTO를 Product 엔티티로 변환
+
+        // MultipartFile를 ProductImage 엔티티로 변환
+        List<ProductImage> productImages = new ArrayList<>();
+        for (MultipartFile image : images) {
+            ProductImage productImage = objectStorageService.uploadFile(image); // 이미지 저장 후 DTO에 보관
+            productImage.setProduct(product); // product 속성 설정
+            productImages.add(productImage);
+        }
+
+        // 이미지 리스트 저장 및 엔티티를 DTO로 변환
+        List<ProductImage> productImage = productImageRepository.saveAll(productImages);
+//        List<ProductImageDTO> productImageDto = productImage.stream().map(ProductImageDTO::new).collect(Collectors.toList());
+        List<ProductImageDTO> productImageDtoResponse = ProductImageMapper.INSTANCE.productImageToProductImageDTO(productImage);
+
 
         // ProductResponseDTO 생성 및 반환
-        ProductResponseDTO response = new ProductResponseDTO(products, images);
-        return response;
+        return new ProductResponseDTO(productDtoResponse, productImageDtoResponse);
     }
 }

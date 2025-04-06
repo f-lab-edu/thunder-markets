@@ -4,10 +4,9 @@ import com.tmarket.model.member.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 @Builder
 @Entity
 @Table(name = "products")
-public class Products {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,18 +32,28 @@ public class Products {
     private String productContent;  // 상품 설명 (TEXT 타입)
 
     @Column(name = "product_price", nullable = false)
-    private Double productPrice;  // 상품 가격
+    private BigDecimal productPrice;  // 상품 가격
 
-    @ElementCollection
-    @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "category_name")
-    private List<String> productCategories;  // 카테고리 리스트
+    // 제외
+//    @ElementCollection
+//    @CollectionTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id"))
+//    @Column(name = "category_name")
+//    private List<String> productCategories;  // 카테고리 리스트
 
     @Column(name = "payment_option", nullable = false, length = 50)
     private String paymentOption;  // 결제 옵션
 
     @Column(name = "thumb_product_img", nullable = false, length = 255)
     private String thumbnailProductImage;  // 대표 이미지 URL
+
+    @Column(name = "thumb_origin_name")
+    private String thumbnailOriginName;    // 썸네일 원본파일명
+
+    @Column(name = "thumb_file_name")
+    private String thumbnailFileName;      // 썸네일 파일명(UUID)
+
+    @Column(name = "thumb_file_path")
+    private String thumbnailFilePath;      // 썸네일 Path
 
     @Column(name = "product_stts", nullable = false, length = 20)
     private String productStatus;  // 상품 상태 (예: 판매 중, 품절 등)
@@ -87,24 +96,25 @@ public class Products {
     }
 
 
-    public Products(ProductDTO productDTO, User seller) {
-        this.productName = productDTO.getProductName();
-        this.productTitle = productDTO.getProductTitle();
-        this.productContent = productDTO.getProductContent();
-        this.productPrice = productDTO.getProductPrice();
-        this.productCategories = productDTO.getProductCategories();
-        this.paymentOption = productDTO.getPaymentOption();
-        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
-        this.productStatus = productDTO.getProductStatus();
-        this.isActive = productDTO.getIsActive();
-        this.registDate = productDTO.getRegistDate();
-        this.modifyDate = productDTO.getModifyDate();
-        this.deleteDate = productDTO.getDeleteDate();
-        this.seller = seller;
-        this.productImages = productDTO.getProductImages() != null ?
-                productDTO.getProductImages().stream()
-                        .map(imageDTO -> new ProductImage(imageDTO, this))
-                        .collect(Collectors.toList()) :
-                new ArrayList<>();
-    }
+//    public Product(ProductDTO productDTO, User seller) {
+//        this.productName = productDTO.getProductName();
+//        this.productTitle = productDTO.getProductTitle();
+//        this.productContent = productDTO.getProductContent();
+//        this.productPrice = productDTO.getProductPrice();
+////        this.productCategories = productDTO.getProductCategories();
+//        this.paymentOption = productDTO.getPaymentOption();
+//        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
+//        this.productStatus = productDTO.getProductStatus();
+//        this.isActive = productDTO.getIsActive();
+//        this.registDate = productDTO.getRegistDate();
+//        this.modifyDate = productDTO.getModifyDate();
+//        this.deleteDate = productDTO.getDeleteDate();
+//        this.seller = seller;
+//        this.productImages = productDTO.getProductImages() != null ?
+//                productDTO.getProductImages().stream()
+//                        .map(imageDTO -> new ProductImage(imageDTO, this))
+//                        .collect(Collectors.toList()) :
+//                new ArrayList<>();
+//    }
+
 }

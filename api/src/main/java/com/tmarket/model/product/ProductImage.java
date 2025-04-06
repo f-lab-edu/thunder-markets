@@ -17,7 +17,7 @@ public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_img_idx")
-    private Long productImgageIndex; // 상품 이미지 일련번호 (PK, auto_increment)
+    private Long productImageIndex; // 상품 이미지 일련번호 (PK, auto_increment)
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "reg_dt", nullable = false, updatable = false)
@@ -46,7 +46,7 @@ public class ProductImage {
     // products 테이블의 product_id를 참조하는 FK
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    private Products product; // 상품 정보
+    private Product product; // 상품 정보
 
     // 엔티티 생성 전 실행되는 메서드
     @PrePersist
@@ -62,13 +62,14 @@ public class ProductImage {
         this.modifyDate = new Date();
     }
 
-    public ProductImage(ProductImageDTO imageDTO, Products product) {
-        this.actFileName = imageDTO.getActFileName();
-        this.actFileOriginName = imageDTO.getActFileOriginName();
-        this.imagePathName = imageDTO.getImagePathName();
-        this.deleteYesNo = imageDTO.getDeleteYesNo();
-        this.product = product;
-        this.registDate = new Date();
-        this.modifyDate = new Date();
-    }
+//    public ProductImage(ProductImageDTO imageDTO, Product product) {
+//        this.product = product;
+//        this.registDate = imageDTO.getRegistDate();
+//        this.modifyDate = imageDTO.getModifyDate();
+//        this.deleteDate = imageDTO.getDeleteDate();
+//        this.actFileName = imageDTO.getActFileName();
+//        this.actFileOriginName = imageDTO.getActFileOriginName();
+//        this.imagePathName = imageDTO.getImagePathName();
+//        this.deleteYesNo = imageDTO.getDeleteYesNo();
+//    }
 }

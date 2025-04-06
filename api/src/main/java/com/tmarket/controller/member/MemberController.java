@@ -1,5 +1,6 @@
 package com.tmarket.controller.member;
 
+import com.tmarket.model.member.JwtTokenRequestDTO;
 import com.tmarket.model.member.LoginDTO;
 import com.tmarket.model.member.LoginDTO.LoginRequest;
 import com.tmarket.model.member.LoginDTO.LoginResponse;
@@ -37,6 +38,15 @@ public class MemberController {
 
         LoginDTO.LoginResponse response = authenticationService.authenticateUser(request);
         httpServletResponse.setHeader("Authorization", "Bearer " + response.getAccessToken());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reAuthenticate")
+    public ResponseEntity<LoginDTO.LoginResponse> reAuthenticateUser(@RequestBody JwtTokenRequestDTO request) {
+        LoginDTO.LoginResponse response = authenticationService.reAuthenticateUser(
+                request.getAccessToken(),
+                request.getRefreshToken()
+        );
         return ResponseEntity.ok(response);
     }
 

@@ -1,6 +1,6 @@
 package com.tmarket.model.member;
 
-import com.tmarket.model.product.Products;
+import com.tmarket.model.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,7 +56,7 @@ public class User {
     // CascadeType.ALL: User 삭제 시 관련된 Products도 삭제 가능
     // orphanRemoval = true: User에서 제거된 Products는 자동 삭제
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Products> products;
+    private List<Product> products;
 
     // 엔티티가 처음 저장되기 전에 실행되는 메서드 (회원 가입 시 자동 설정)
     @PrePersist

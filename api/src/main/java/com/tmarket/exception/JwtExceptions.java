@@ -38,4 +38,11 @@ public class JwtExceptions {
             super(message);
         }
     }
+
+    @Getter
+    public static class TokenNeedsReissueException  extends UnauthorizedException {
+        public TokenNeedsReissueException(String message) {
+            super(message);
+        }
+    }
 }

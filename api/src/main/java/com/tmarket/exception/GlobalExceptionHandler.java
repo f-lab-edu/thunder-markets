@@ -8,6 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 // @ControllerAdvice : 전역 예외 핸들러 매핑 클래스
 // basePackages : 특정 패키지 지정
 // assignableTypes  : 특정 클래스 지정
@@ -63,17 +69,29 @@ public class GlobalExceptionHandler {
             JwtExceptions.UnsupportedTokenException.class,
             JwtExceptions.MalformedTokenException.class,
             JwtExceptions.InvalidSignatureException.class,
-            JwtExceptions.InvalidTokenException.class
+            JwtExceptions.InvalidTokenException.class,
+            JwtExceptions.TokenNeedsReissueException.class
     })
     public ResponseEntity<String> handleJwtExceptions(UnauthorizedException ex) {
         logger.error("JWT 예외 발생: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
-    // 500 기타 모든 예외 처리 (Exception)
+    // 500 기타 모든 예외 처리 (Exception) - Internal Server Error (좀 더 구체적으로 메시지 처리)
     @ExceptionHandler({InternalServerException.class, Exception.class})
-    public ResponseEntity<String> handleGlobalException(Exception ex) {
-        logger.error("예상치 못한 서버 오류 발생: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("예상치 못한 오류가 발생했습니다.");
+    public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
+        logger.error("예상치 못한 서버 오류 발생: {}", ex); // 예외 전체 스택 트레이스
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put("message", "예상치 못한 오류가 발생했습니다.");
+        errorDetails.put("error", ex.getClass().getSimpleName()); // 발생한 예외 클래스명
+        errorDetails.put("details", ex.getMessage()); // 예외 상세 메시지
+        errorDetails.put("stackTrace", sw.toString()); // 예외 스택 트레이스
+        errorDetails.put("timestamp", new Date()); // 예외 발생 일자
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorDetails);
     }
 }
