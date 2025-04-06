@@ -41,7 +41,7 @@ public class AuthenticationIntegrationTestUtil {
                 loginUrl, request, LoginDTO.LoginResponse.class);
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody().getAccessToken(); // 엑세스 토큰에 Barer가 포함되어 있음
+            return response.getBody().getAccessToken(); // 엑세스 토큰에 Bearer가 포함되어 있음
         }
         throw new RuntimeException("토큰 발급 실패");
     }

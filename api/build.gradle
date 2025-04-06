@@ -24,6 +24,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // spring-security
+    // implementation 'org.springframework.boot:spring-boot-starter-security'
+
     // Bcrypt 해시 알고리즘
     implementation 'org.springframework.security:spring-security-crypto'
 
@@ -38,6 +41,7 @@ dependencies {
 
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
 
     // 테스트 코드
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

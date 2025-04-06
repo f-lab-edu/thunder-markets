@@ -69,7 +69,8 @@ public class GlobalExceptionHandler {
             JwtExceptions.UnsupportedTokenException.class,
             JwtExceptions.MalformedTokenException.class,
             JwtExceptions.InvalidSignatureException.class,
-            JwtExceptions.InvalidTokenException.class
+            JwtExceptions.InvalidTokenException.class,
+            JwtExceptions.TokenNeedsReissueException.class
     })
     public ResponseEntity<String> handleJwtExceptions(UnauthorizedException ex) {
         logger.error("JWT 예외 발생: {}", ex.getMessage());
