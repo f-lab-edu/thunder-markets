@@ -47,8 +47,6 @@ spring:
 
 ncp:
   s3:
-    access-key: ncp_iam_BPAMKR2LGnNsh7KnKWFh
-    secret-key: ncp_iam_BPKMKRXF3uPyikTdPMUkczbkNhPQbsOflv
     region: kr-standard
     endpoint: https://kr.object.ncloudstorage.com
     bucket: tmarket
