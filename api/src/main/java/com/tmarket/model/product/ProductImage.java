@@ -61,15 +61,4 @@ public class ProductImage {
     protected void onUpdate() {
         this.modifyDate = new Date();
     }
-
-//    public ProductImage(ProductImageDTO imageDTO, Product product) {
-//        this.product = product;
-//        this.registDate = imageDTO.getRegistDate();
-//        this.modifyDate = imageDTO.getModifyDate();
-//        this.deleteDate = imageDTO.getDeleteDate();
-//        this.actFileName = imageDTO.getActFileName();
-//        this.actFileOriginName = imageDTO.getActFileOriginName();
-//        this.imagePathName = imageDTO.getImagePathName();
-//        this.deleteYesNo = imageDTO.getDeleteYesNo();
-//    }
 }

@@ -25,7 +25,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // spring-security
-    // implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Bcrypt 해시 알고리즘
     implementation 'org.springframework.security:spring-security-crypto'
@@ -57,6 +57,9 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // lombok과 mapstruct 연동
+
+    // s3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.672'
 }
 
 compileJava.options.encoding = 'UTF-8'

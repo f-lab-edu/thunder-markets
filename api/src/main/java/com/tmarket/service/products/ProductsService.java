@@ -32,9 +32,6 @@ public class ProductsService {
             throw new IllegalArgumentException("판매자를 찾을 수 없습니다.");
         }
 
-        // 상품 정보에 판매자 정보 설정
-        //productDto.setSellerId(sellerInfo.getUserId()); - 불필요하므로 제거
-
         // ProductDTO를 Product 엔티티로 변환
         Product product = ProductDtoMapper.INSTANCE.productDTOtoProduct(productDto, sellerInfo);
         // Product product = new Product(productDto, sellerInfo);
@@ -70,5 +67,23 @@ public class ProductsService {
 
         // ProductResponseDTO 생성 및 반환
         return new ProductResponseDTO(productDtoResponse, productImageDtoResponse);
+    }
+
+    public List<ProductResponseDTO> getProductList() {
+
+        // 1. 전체 상품 조회
+        List<Product> productList = productsRepository.findAll();
+
+        // 2. 각 상품에 대해 이미지 조회 및 DTO 매핑
+        return productList.stream()
+                .map(product -> {
+                    ProductDTO productDto = ProductMapper.INSTANCE.productToProductDTO(product);
+
+                    List<ProductImage> productImages = productImageRepository.findAllByProduct(product);
+                    List<ProductImageDTO> productImageDtoList = ProductImageMapper.INSTANCE.productImageToProductImageDTO(productImages);
+
+                    return new ProductResponseDTO(productDto, productImageDtoList);
+                })
+                .toList();
     }
 }
