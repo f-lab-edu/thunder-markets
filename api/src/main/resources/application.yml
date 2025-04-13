@@ -45,6 +45,14 @@ spring:
       org.mybatis: DEBUG                          # MyBatis SQL 실행 로그
       org.springframework.jdbc: DEBUG             # JDBC 디버깅
 
+ncp:
+  s3:
+    access-key: ncp_iam_BPAMKR2LGnNsh7KnKWFh
+    secret-key: ncp_iam_BPKMKRXF3uPyikTdPMUkczbkNhPQbsOflv
+    region: kr-standard
+    endpoint: https://kr.object.ncloudstorage.com
+    bucket: tmarket
+
 property-file-config:
   fileDirectory: D:/flab/workspace-tmk-dev/upload/file/
   imageDirectory: D:/flab/workspace-tmk-dev/upload/image/

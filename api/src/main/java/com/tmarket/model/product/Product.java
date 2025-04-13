@@ -95,26 +95,4 @@ public class Product {
         this.modifyDate = new Date();
     }
 
-
-//    public Product(ProductDTO productDTO, User seller) {
-//        this.productName = productDTO.getProductName();
-//        this.productTitle = productDTO.getProductTitle();
-//        this.productContent = productDTO.getProductContent();
-//        this.productPrice = productDTO.getProductPrice();
-////        this.productCategories = productDTO.getProductCategories();
-//        this.paymentOption = productDTO.getPaymentOption();
-//        this.thumbnailProductImage = productDTO.getThumbnailProductImage();
-//        this.productStatus = productDTO.getProductStatus();
-//        this.isActive = productDTO.getIsActive();
-//        this.registDate = productDTO.getRegistDate();
-//        this.modifyDate = productDTO.getModifyDate();
-//        this.deleteDate = productDTO.getDeleteDate();
-//        this.seller = seller;
-//        this.productImages = productDTO.getProductImages() != null ?
-//                productDTO.getProductImages().stream()
-//                        .map(imageDTO -> new ProductImage(imageDTO, this))
-//                        .collect(Collectors.toList()) :
-//                new ArrayList<>();
-//    }
-
 }

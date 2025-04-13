@@ -27,8 +27,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(new MvcRequestMatcher(introspector, "/")).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, "/auth/**")).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, "/products/list")).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, "/h2-console/**")).permitAll()
-                    .requestMatchers(new MvcRequestMatcher(introspector, "/favicon.ico")).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, "/error")).permitAll()
                     .anyRequest().authenticated()
             )
